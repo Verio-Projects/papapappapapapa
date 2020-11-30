@@ -8,11 +8,11 @@ import os
 import os.path
 import string
 
-urls = ('/build/(.*)', 'build')
+urls = ('/build/(.*)/(.*)', 'build')
 
 def validate(project):
     for char in project:
-        if char in string.ascii_letters:
+        if char == '-' or char in string.ascii_letters:
             continue
         else:
             return False
@@ -21,17 +21,23 @@ def validate(project):
 
 class build():
 
-    def GET(self, project):
+    def GET(self, user, project):
+
+        print(user, project)
+
+        if not validate(user):
+            return 'haha'
 
         if not validate(project):
             return 'haha'
 
         try:
             # clone the repo from the verio github
-            repo = Repo.clone_from('git@github.com:Verio-Projects/' + project + '.git', os.path.join('./builds/', project), branch='master')
-        except exc.GitCommandError:
+            repo = Repo.clone_from('git@github.com:' + user + '/' + project + '.git', os.path.join('./builds/', project))
+        except exc.GitCommandError as e:
             # we assume that the error is cause the repository has already been cloned
             # so we just pull the latest commits
+            print(e)
             print('pullin')
             Git(os.path.join('./builds/', project)).pull()
       
@@ -43,8 +49,7 @@ class build():
        
         # loop through all jar files in the target directory
         for file in os.listdir('./builds/' + project + '/target/'):
-            if file.endswith('.jar'):
-                
+            if file.endswith('.jar'): 
                 # add the current file to the zip
                 zip.write('./builds/' + project + '/target/' + file)
 
