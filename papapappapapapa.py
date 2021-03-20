@@ -41,7 +41,7 @@ class build():
             print('pullin')
             Git(os.path.join('./builds/', project)).pull()
       
-        # build the downloaded project using maven (assuming it uses java, of course)
+        # build the downloaded project using maven (assuming it uses java, and maven, of course)
         os.system('mvn clean package -f ' + ('./builds/' + project + '/pom.xml'))  
 
         # create a zip file on ./builds/(project).zip
